@@ -6,7 +6,7 @@ set -e
 ip=${POD_IP-`hostname -i`}                                  # ip address of pod
 redis_port=${NODE_PORT_NUMBER-6379}                         # redis port
 sentinel_port=${SENTINEL_PORT_NUMBER-26379}                 # sentinel port
-group_name="$POD_NAMESPACE-$(hostname | sed 's/-[0-9]$//')" # master group name
+group_name="myredis"                                        # master group name
 quorum="${SENTINEL_QUORUM-2}"                               # quorum needed
 
 # Sentinel options

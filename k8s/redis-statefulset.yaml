@@ -1,18 +1,19 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: redis
+  name: redis-cluster
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
-  serviceName: redis-nodes
+  serviceName: redis-cluster-nodes
   replicas: 3
   template:
     metadata:
       labels:
-        name: redis-node
+        name: redis-cluster-node
     spec:
       terminationGracePeriodSeconds: 10
+      serviceAccount: redis-cluster
       containers:
         # Redis
         - name: redis-node
@@ -85,15 +86,14 @@ spec:
                   fieldPath: metadata.labels
         - name: redis-config
           configMap:
-            name: redis-sentinel
+            name: redis-cluster-sentinel
   volumeClaimTemplates:
     - metadata:
         name: data
         annotations:
-          volume.beta.kubernetes.io/storage-class: "ssd"
-          gcp-auto-backup: "yes"
+          volume.beta.kubernetes.io/storage-class: "rbd"
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 20Gi
+            storage: 1Gi
