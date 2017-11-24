@@ -1,8 +1,9 @@
 FROM redis:3.2
-MAINTAINER Jason Waldrip <jwaldrip@commercialtribe.com>
+MAINTAINER Flant OJSC <vasily.marmer@flant.ru>
 
-ADD https://storage.googleapis.com/kubernetes-release/release/v1.6.0/bin/linux/amd64/kubectl /usr/local/bin/kubectl
-RUN chmod +x /usr/local/bin/kubectl
+RUN mkdir -p /etc/pod-info
+RUN touch /etc/pod-info/labels
+RUN apt-get update && apt-get install -y jq curl
 
 WORKDIR /app
 ADD . /app
