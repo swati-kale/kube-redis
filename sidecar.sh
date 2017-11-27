@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 [ "$DEBUG" == "true" ] && set -x
-#set -x
 # Set vars
 hostname=$(hostname)                                         # hostname of pod
 ip=${POD_IP-$(hostname -i)}                                  # ip address of pod
@@ -62,10 +61,6 @@ ping-sentinel() {
   sentinel-cli ping > /dev/null
 }
 
-#ping-sentinel() {
-#  sentinel-cli SENTINEL sentinels $group_name
-#}
-
 # Ping redis and sentinel to see if they are up
 ping-both(){
   ping && ping-sentinel
@@ -85,12 +80,6 @@ sentinel-reset() {
   if [[ "$?" != "0" ]]; then
     return 1;
   fi
-#  sentinels_in_redis_cnt=`cli -h $host -p $sentinel_port SENTINEL sentinels $group_name | grep name | wc -l`
-#  if [[ "$sentinels_in_redis_cnt" == "$desired_sentinels_cnt" ]]; then
-#    #no need in reset
-#    log DEBUG "NO NEED RESET SENTINEL $sentinels_in_redis_cnt $desired_sentinels_cnt"
-#    return 0;
-#  fi
   cli -h $host -p $sentinel_port SENTINEL RESET $group_name
   tmp_cnt=0
   while true; do
@@ -228,28 +217,6 @@ panic () {
   exit 1
 }
 
-#self_healing(){
-#  active_master=$1
-#  if [ ! -z "$active_master" ] && [ -z "`cli -h $active_master ping`" ]; then
-#    i="0"
-#    while [ $i -lt 5 ]; do
-#      if [ ! -z "`cli -h $active_master ping`" ]; then
-#        # все ок, активный мастер ожил сам
-#        break
-#      fi
-#      i=$[$i+1]
-#      log DEBUG "self_healing: $i"
-#      sleep 1
-#    done
-#    if [ $i -ge 5 ]; then
-#      sentinel-cli sentinel remove $group_name
-#      # чистим sentinel & reboot
-#      log DEBUG "self_healing exit 1"
-#      exit 1;
-#    fi
-#  fi
-#}
-
 # Boot the sidecar
 boot(){
   log INFO "booting (ip: $ip)"
@@ -335,9 +302,7 @@ $host"
         fi
       done
     fi;
-    #log DEBUG "monitor-state-ng while"
-    # self healing
-    #self_healing $active_master
+    #TODO repair if cluster is fully broken
 
     sleep 1
     if [ -f "/data/$HOSTNAME.restart" ]; then
