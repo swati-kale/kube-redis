@@ -59,7 +59,7 @@ spec:
 
         # Sidecar
         - name: redis-sidecar
-          image: commercialtribe/redis-sentinel-sidecar:v20170407.1
+          image: flant/kube-redis
           imagePullPolicy: Always
           env:
             - name: POD_NAMESPACE
