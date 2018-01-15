@@ -197,8 +197,8 @@ set-role-label () {
   log INFO "set label \"role=$pod_role\""
 #  (kubectl label --overwrite pods `hostname` role=$1 > /dev/null) || panic "set-role-label failed"
   curl -sfS --cacert $KUBE_CA -H "Authorization: Bearer $KUBE_TOKEN" \
-    -H "Content-Type:application/json-patch+json" -X PATCH \
-    --data "[{\"op\":\"replace\",\"path\":\"/metadata/labels/role\", \"value\": \"$pod_role\" }]" \
+    -H "Content-Type:application/merge-patch+json" -X PATCH \
+    --data "{\"metadata\":{\"labels\":{\"role\":\"$pod_role\" }}}" \
     https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT_HTTPS/api/v1/namespaces/$KUBE_NS/pods/$pod_hostname >>/dev/null || panic "set-role-label failed"
 }
 
