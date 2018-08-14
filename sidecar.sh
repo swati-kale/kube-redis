@@ -166,7 +166,7 @@ fix-sentinel-if-needed(){
 }
 
 unset-label-on-other-masters(){
-  labels=$(echo $(cat /etc/pod-info/labels | grep -v "role=") | tr -d '"' | tr " " ","),role=master
+  labels=$(echo $(cat /etc/pod-info/labels | grep -E '(app|controller-revision-hash)' ) | tr -d '"' | tr " " ","),role=master
   for i in `curl -sS --cacert $KUBE_CA -H "Authorization: Bearer $KUBE_TOKEN" \
     https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT_HTTPS/api/v1/namespaces/$KUBE_NS/pods?labelSelector=$labels \
   | jq -r '.["items"][] | .status.conditions[].type + "=" + .status.conditions[].status + " " +.status.podIP + " " +.metadata.name' | grep 'Ready=True' | grep -v $ip | awk '{print $3}' | sort | uniq`; do
@@ -176,14 +176,14 @@ unset-label-on-other-masters(){
 }
 
 get-hosts(){
-  labels=$(echo $(cat /etc/pod-info/labels | grep -v "role=" ) | tr -d '"' | tr " " ",")
+  labels=$(echo $(cat /etc/pod-info/labels | grep -E '(app|controller-revision-hash)' ) | tr -d '"' | tr " " ",")
   curl -sS --cacert $KUBE_CA -H "Authorization: Bearer $KUBE_TOKEN" \
     https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT_HTTPS/api/v1/namespaces/$KUBE_NS/pods?labelSelector=$labels \
   | jq -r '.["items"][] | .status.conditions[].type + "=" + .status.conditions[].status + " " +.status.podIP' | grep 'Ready=True' | awk '{print $2}' | sort | uniq | grep -v $ip
 }
 
 get-all-hosts(){
-  labels=$(echo $(cat /etc/pod-info/labels | grep -v "role=" ) | tr -d '"' | tr " " ",")
+  labels=$(echo $(cat /etc/pod-info/labels | grep -E '(app|controller-revision-hash)' ) | tr -d '"' | tr " " ",")
   curl -sS --cacert $KUBE_CA -H "Authorization: Bearer $KUBE_TOKEN" \
     https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT_HTTPS/api/v1/namespaces/$KUBE_NS/pods?labelSelector=$labels \
   | jq -r '.["items"][] | .status.conditions[].type + "=" + .status.conditions[].status + " " +.status.podIP' | grep 'Ready=True' | awk '{print $2}' | sort | uniq
