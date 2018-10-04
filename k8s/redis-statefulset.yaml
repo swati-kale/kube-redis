@@ -91,7 +91,7 @@ spec:
     - metadata:
         name: data
         annotations:
-          volume.beta.kubernetes.io/storage-class: "rbd"
+          volume.beta.kubernetes.io/storage-class: "glusterfs-storage"
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
